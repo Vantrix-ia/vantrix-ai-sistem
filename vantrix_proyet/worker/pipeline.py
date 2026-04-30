@@ -5,6 +5,8 @@ from vantrix_proyet.engine.feature_engine import analyze_product
 from vantrix_proyet.engine.scorer import calculate_scores
 
 from vantrix_proyet.services.database import save_product
+from vantrix_proyet.services.notifier import send_whatsapp
+
 from vantrix_proyet.core.stealth_scraper import get_products
 
 
@@ -12,7 +14,7 @@ def run_pipeline(trend="viral product"):
 
     logger.info(f"🚀 Iniciando pipeline para: {trend}")
 
-    # 1. Scraping
+    # 🔎 1. SCRAPING
     try:
         products = get_products(trend)
         logger.info(f"📦 Productos encontrados: {len(products)}")
@@ -26,27 +28,28 @@ def run_pipeline(trend="viral product"):
 
     expert = VantrixDecisionExpert()
 
-    # 2. Procesamiento
+    # ⚙️ 2. PROCESAMIENTO
     for p in products:
 
         try:
-            # 🔹 Step 1: convertir a modelo Product
+            # 🧠 Paso 1: análisis base
             product = analyze_product(p)
 
-            # 🔹 Step 2: scoring adicional (trend, saturation, etc.)
+            # 📊 Paso 2: scoring
             product = calculate_scores(product)
 
-            # 🔹 Step 3: decisión
+            # 🎯 Paso 3: decisión
             product = expert.make_decision(product)
 
-            # 🔹 Log
+            # 📋 LOG
             logger.info(
-                f"🧠 {product.title} | Profit: {product.profit:.2f} | "
-                f"VScore: {product.v_score:.2f} | Decision: {product.decision}"
+                f"📦 {product['title']} | Score: {product.get('score', 0)} | Decision: {product['decision']}"
             )
 
-            # 🔹 Guardar en DB
-            save_product(product)
+            # 💾 + 📲 SOLO WINNERS
+            if product["decision"] == "WINNER":
+                save_product(product)
+                send_whatsapp(product)
 
         except Exception as e:
             logger.error(f"❌ Error procesando producto: {e}")

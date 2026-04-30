@@ -1,11 +1,20 @@
-def analyze_product(product):
-    selling_price = product.get("selling_price", 0)
-    cost = product.get("cost", 0)
+from vantrix_proyet.core.logger import logger
 
-    profit = selling_price - cost
-    margin = profit / selling_price if selling_price else 0
+# 🔥 MODO SIMPLE (sin Twilio para evitar errores ahora)
+# Luego lo activamos bien si quieres producción real
 
-    product["profit"] = profit
-    product["margin"] = margin
+def send_whatsapp(product: dict):
 
-    return product
+    try:
+        # 📲 Simulación de envío
+        logger.info("📲 WhatsApp enviado (simulado)")
+        logger.info(
+            f"🔥 ALERTA:\n"
+            f"Producto: {product['title']}\n"
+            f"Precio: {product['selling_price']}\n"
+            f"Score: {product.get('score', 0)}\n"
+            f"Decision: {product['decision']}"
+        )
+
+    except Exception as e:
+        logger.error(f"❌ Error en notifier: {e}")

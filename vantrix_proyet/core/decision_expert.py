@@ -1,28 +1,18 @@
 class VantrixDecisionExpert:
 
-    def calculate_v_score(self, product):
-
-        margin = product.margin
-        trend = getattr(product, "trend_score", 0)
-        saturation = getattr(product, "saturation_score", 0)
-        branding = getattr(product, "branding_score", 0)
-
-        return (
-            margin * 0.4 +
-            trend * 0.3 +
-            (1 - saturation) * 0.2 +
-            branding * 0.1
+    def make_decision(self, product):
+        v_score = (
+            product.profit * 0.4 +
+            product.trend_score * 0.3 +
+            (1 - product.saturation_score) * 0.2 +
+            product.branding_score * 0.1
         )
 
-    def make_decision(self, product):
+        product.v_score = round(v_score, 2)
 
-        product.v_score = self.calculate_v_score(product)
-
-        if product.v_score >= 0.7:
-            product.decision = "BUY"
-        elif product.v_score >= 0.5:
-            product.decision = "TEST"
+        if product.v_score > 50:
+            product.decision = "GANADOR"
         else:
-            product.decision = "SKIP"
+            product.decision = "DESCARTAR"
 
         return product

@@ -1,44 +1,14 @@
-import sqlite3
-import os
-
-# 📁 ruta base del proyecto
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-# 📁 archivo DB
-DB_PATH = os.path.join(BASE_DIR, "data", "vantrix.db")
-
-
-def init_db():
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS products (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        title TEXT,
-        profit REAL,
-        v_score REAL,
-        decision TEXT
-    )
-    """)
-
-    conn.commit()
-    conn.close()
-
+import json
+from vantrix_proyet.core.logger import logger
 
 def save_product(product):
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
+    data = product.to_dict()
 
-    cursor.execute("""
-    INSERT INTO products (title, profit, v_score, decision)
-    VALUES (?, ?, ?, ?)
-    """, (
-        product.title,
-        product.profit,
-        product.v_score,
-        product.decision
-    ))
+    try:
+        with open("winners.json", "a", encoding="utf-8") as f:
+            f.write(json.dumps(data) + "\n")
 
-    conn.commit()
-    conn.close()
+        logger.info(f"💾 Guardado: {product.title}")
+
+    except Exception as e:
+        logger.error(f"Error guardando producto: {e}")

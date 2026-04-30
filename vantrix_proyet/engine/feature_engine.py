@@ -1,19 +1,10 @@
-from vantrix_proyet.core.models import Product
+def analyze_product(raw_product: dict):
 
-
-def analyze_product(product_dict):
-
-    product = Product(
-        title=product_dict.get("title"),
-        cost=product_dict.get("cost", 0),
-        selling_price=product_dict.get("selling_price", 0)
-    )
-
-    product.profit = product.selling_price - product.cost
-
-    if product.selling_price > 0:
-        product.margin = product.profit / product.selling_price
-    else:
-        product.margin = 0
-
-    return product
+    # 🔥 Simple: ya viene limpio del scraper
+    return {
+        "title": raw_product["title"],
+        "selling_price": raw_product["selling_price"],
+        "cost": raw_product["cost"],
+        "rating": raw_product.get("rating", 4.0),
+        "reviews": raw_product.get("reviews", 100),
+    }
